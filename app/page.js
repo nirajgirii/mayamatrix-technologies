@@ -1,29 +1,102 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import LandingPage from "../components/LandingPage";
 
 export default function Home() {
   const [entered, setEntered] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [stars, setStars] = useState([]);
+
+  useEffect(() => {
+    // Generate random stars on the client side only
+    const generatedStars = [...Array(200)].map(() => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      size: `${Math.random() * 3}px`,
+      delay: `${Math.random() * 2}s`,
+      duration: `${Math.random() * 3 + 1}s`,
+    }));
+    setStars(generatedStars);
+
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  const handleEnter = () => {
+    setEntered(true);
+  };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white">
-      {!entered ? (
-        <div className="flex items-center justify-center min-h-screen backdrop-blur-md">
+    <main
+      onClick={!entered ? handleEnter : undefined}
+      className={`min-h-screen relative ${
+        entered
+          ? "bg-gradient-to-br from-purple-600 to-blue-500 text-white "
+          : "backdrop-blur-md bg-gradient-to-br from-purple-600 to-blue-500 text-white overflow-hidden"
+      }`}
+    >
+      {/* Cursor light effect */}
+      <div
+        className="pointer-events-none fixed w-[400px] h-[400px] rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%)",
+          transform: `translate(${mousePosition.x - 200}px, ${
+            mousePosition.y - 200
+          }px)`,
+          transition: "transform 0.2s ease-out",
+        }}
+      />
+
+      {/* Stars background */}
+      <div className="stars-container absolute inset-0">
+        {stars.map((star, i) => (
+          <div
+            key={i}
+            className="star absolute rounded-full bg-white"
+            style={{
+              top: star.top,
+              left: star.left,
+              width: star.size,
+              height: star.size,
+              animation: `twinkle ${star.duration} infinite ${star.delay}`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div
+        className={`absolute inset-0 ${
+          entered ? "opacity-0 pointer-events-none" : "opacity-100"
+        } transition-opacity duration-500`}
+      >
+        <div className="flex items-center justify-center min-h-screen">
           <button
-            onClick={() => setEntered(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEnter();
+            }}
             className="px-6 py-3 text-lg font-bold text-white bg-transparent border-2 border-white rounded-full transition-all duration-300 hover:bg-white hover:text-purple-600 hover:scale-110"
           >
             Enter MayaMatrix Technology World
           </button>
         </div>
-      ) : (
-        <>
-          <Navbar />
-          <LandingPage />
-        </>
-      )}
+      </div>
+
+      <div
+        className={`absolute inset-0 ${
+          entered ? "opacity-100" : "opacity-0 pointer-events-none"
+        } transition-opacity duration-500`}
+      >
+        <Navbar />
+        <LandingPage />
+      </div>
     </main>
   );
 }
