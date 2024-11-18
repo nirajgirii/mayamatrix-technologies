@@ -117,7 +117,7 @@ export default function About() {
               <p className="text-gray-700 leading-relaxed">
                 MayaMatrix is the leading global technology services company,
                 dedicated to creating better digital products that bring your
-                brand to life through Sound &amp; Technology. With our team of
+                brand to life through Sound and Technology. With our team of
                 expert developers, designers, and sound engineers, we offer a
                 unique blend of creativity and technical expertise.
               </p>
@@ -131,7 +131,7 @@ export default function About() {
                 Our mission is to empower businesses with innovative digital
                 solutions that drive growth and enhance user experiences. From
                 web and mobile app development to sound design and graphic
-                creation, we're committed to delivering excellence in every
+                creation, we&apos;re committed to delivering excellence in every
                 project we undertake.
               </p>
             </div>
