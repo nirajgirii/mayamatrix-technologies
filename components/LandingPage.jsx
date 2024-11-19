@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import ContactForm from "./ContactFrom";
 import { Music, Code, Smartphone, Palette } from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import About from "./About";
+import ServicesSection from "./ServiceSection";
 const heroImages = [
   "/hero-image-1.jpg",
   "/hero-image-2.jpg",
@@ -209,66 +209,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section
-        id="services"
-        className="py-20 bg-gradient-to-b from-white via-purple-50 to-pink-50"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent mb-4">
-              Our Services
-            </h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto font-medium">
-              Transforming ideas into digital reality with our comprehensive
-              suite of services
-            </p>
-          </motion.div>
-
-          <div className="space-y-12 text-gray-700">
-            <ServiceCard
-              icon={<Music className="h-8 w-8" />}
-              title="Sound Design"
-              description="Elevate your brand with our cutting-edge sound design services. We create immersive audio experiences that resonate with your audience and bring your vision to life."
-              imageSrc="/sound-design.jpg"
-              imageAlt="Sound Design Studio"
-              reverse={false}
-              textColor="text-gray-800"
-            />
-            <ServiceCard
-              icon={<Code className="h-8 w-8" />}
-              title="Web Development"
-              description="Transform your online presence with our expert web development services. We build responsive, user-friendly websites that drive engagement and deliver results."
-              imageSrc="/web-development.jpg"
-              imageAlt="Web Development Process"
-              reverse={true}
-              textColor="text-gray-800"
-            />
-            <ServiceCard
-              icon={<Smartphone className="h-8 w-8" />}
-              title="Mobile Apps"
-              description="Bring your ideas to life with our innovative mobile app development. We create intuitive, feature-rich applications that captivate users and drive business growth."
-              imageSrc="/mobile-apps.jpg"
-              imageAlt="Mobile App Development"
-              reverse={false}
-              textColor="text-gray-800"
-            />
-            <ServiceCard
-              icon={<Palette className="h-8 w-8" />}
-              title="Graphic Design"
-              description="Make a lasting impression with our creative graphic design services. From logos to marketing materials, we craft visually stunning designs that communicate your brand's essence."
-              imageSrc="/graphic-design.jpg"
-              imageAlt="Graphic Design Process"
-              reverse={true}
-              textColor="text-gray-800"
-            />
-          </div>
-        </div>
-      </section>
+      <ServicesSection />
 
       <About />
 

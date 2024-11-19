@@ -7,11 +7,11 @@ import LandingPage from "../components/LandingPage";
 export default function Home() {
   const [entered, setEntered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [stars, setStars] = useState([]);
+  const [stars, setStars] = useState([]); // Default to an empty array
 
   useEffect(() => {
-    // Generate random stars on the client side only
-    const generatedStars = [...Array(200)].map(() => ({
+    // Generate stars only on the client side
+    const generatedStars = Array.from({ length: 200 }, () => ({
       top: `${Math.random() * 100}%`,
       left: `${Math.random() * 100}%`,
       size: `${Math.random() * 3}px`,
@@ -20,6 +20,7 @@ export default function Home() {
     }));
     setStars(generatedStars);
 
+    // Track mouse movement
     const handleMouseMove = (e) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
@@ -37,7 +38,7 @@ export default function Home() {
       onClick={!entered ? handleEnter : undefined}
       className={`min-h-screen relative ${
         entered
-          ? "bg-gradient-to-br from-purple-600 to-blue-500 text-white "
+          ? "bg-gradient-to-br from-purple-600 to-blue-500 text-white"
           : "backdrop-blur-md bg-gradient-to-br from-purple-600 to-blue-500 text-white overflow-hidden"
       }`}
     >
@@ -55,22 +56,25 @@ export default function Home() {
       />
 
       {/* Stars background */}
-      <div className="stars-container absolute inset-0">
-        {stars.map((star, i) => (
-          <div
-            key={i}
-            className="star absolute rounded-full bg-white"
-            style={{
-              top: star.top,
-              left: star.left,
-              width: star.size,
-              height: star.size,
-              animation: `twinkle ${star.duration} infinite ${star.delay}`,
-            }}
-          />
-        ))}
-      </div>
+      {stars.length > 0 && ( // Ensure stars are only rendered after being set
+        <div className="stars-container absolute inset-0">
+          {stars.map((star, i) => (
+            <div
+              key={i}
+              className="star absolute rounded-full bg-white"
+              style={{
+                top: star.top,
+                left: star.left,
+                width: star.size,
+                height: star.size,
+                animation: `twinkle ${star.duration} infinite ${star.delay}`,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
+      {/* Initial Enter Button */}
       <div
         className={`absolute inset-0 ${
           entered ? "opacity-0 pointer-events-none" : "opacity-100"
@@ -89,6 +93,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Main Content */}
       <div
         className={`absolute inset-0 ${
           entered ? "opacity-100" : "opacity-0 pointer-events-none"
