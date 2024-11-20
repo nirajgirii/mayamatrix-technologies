@@ -7,7 +7,8 @@ import LandingPage from "../components/LandingPage";
 export default function Home() {
   const [entered, setEntered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [stars, setStars] = useState([]); // Default to an empty array
+  const [stars, setStars] = useState([]);
+  const [showGoToTop, setShowGoToTop] = useState(false);
 
   useEffect(() => {
     // Generate stars only on the client side
@@ -25,12 +26,26 @@ export default function Home() {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
+    // Show/Hide "Go to Top" button on scroll
+    const handleScroll = () => {
+      setShowGoToTop(window.scrollY > window.innerHeight / 2);
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const handleEnter = () => {
     setEntered(true);
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -56,7 +71,7 @@ export default function Home() {
       />
 
       {/* Stars background */}
-      {stars.length > 0 && ( // Ensure stars are only rendered after being set
+      {stars.length > 0 && (
         <div className="stars-container absolute inset-0">
           {stars.map((star, i) => (
             <div
@@ -102,6 +117,16 @@ export default function Home() {
         <Navbar />
         <LandingPage />
       </div>
+
+      {/* Go to Top Button */}
+      {showGoToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 w-12 h-12 bg-purple-600 text-white rounded-full shadow-lg flex items-center justify-center transition-transform duration-300 hover:scale-110 hover:bg-purple-700"
+        >
+          ↑
+        </button>
+      )}
     </main>
   );
 }

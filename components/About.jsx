@@ -1,9 +1,9 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
-import { Award, Users } from "lucide-react";
+import { Award, Users, Target, Zap } from "lucide-react";
 
 const Counter = ({ end, title, icon: Icon }) => {
   const [count, setCount] = useState(0);
@@ -189,10 +189,12 @@ export default function About() {
                           className="text-center text-white p-4 transform translate-y-10 
             group-hover:translate-y-0 transition-transform duration-300"
                         >
-                          <h4 className="text-xl font-bold mb-2">
+                          <h4 className="text-[10px] md:text-l font-bold mb-2">
                             {member.name}
                           </h4>
-                          <p className="text-sm opacity-80">{member.role}</p>
+                          <p className="text-[10px] md:text-sm opacity-80">
+                            {member.role}
+                          </p>
                           <div className="mt-3 flex justify-center space-x-3">
                             <motion.a
                               href="#"

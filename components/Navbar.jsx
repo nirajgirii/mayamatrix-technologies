@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import Image from "next/image";
 
 export default function Navbar() {
@@ -13,84 +14,161 @@ export default function Navbar() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const navLinks = [
+    { href: "#services", label: "Services" },
+    { href: "#about", label: "About" },
+    { href: "#contact", label: "Contact" },
+  ];
+
+  const menuVariants = {
+    hidden: {
+      opacity: 0,
+      x: "100%",
+      transition: {
+        duration: 0.3,
+      },
+    },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.3,
+        delayChildren: 0.2,
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const linkVariants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.3,
+      },
+    },
+  };
+
   return (
-    <nav className="fixed w-full z-50 transition-all duration-300 bg-purple-600 shadow-lg">
+    <motion.nav
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={`fixed w-full z-50 transition-all duration-300 
+      ${
+        isScrolled ? "bg-white/90 backdrop-blur-md shadow-lg" : "bg-transparent"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
+          {/* Logo Section */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center space-x-3"
+          >
             <Image
               src="/mayamatrix_technologies_private_limited_logo.png"
               alt="MayaMatrixLogo"
-              width={60}
-              height={60}
+              width={50}
+              height={50}
+              className="rounded-full"
             />
-            <Link href="/" className="text-white font-bold text-xl">
+            <Link
+              href="/"
+              className={`text-xl font-bold 
+              ${isScrolled ? "text-purple-600" : "text-white"}`}
+            >
               MayaMatrix
             </Link>
-          </div>
+          </motion.div>
 
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              <NavLink href="#services">Services</NavLink>
-              <NavLink href="#about">About</NavLink>
-              <NavLink href="#contact">
-                Contact
-                <span className="ml-2 transform translate-x-[-10px] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
-                  →
-                </span>
+          {/* Desktop Navigation */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="hidden md:flex items-center space-x-6"
+          >
+            {navLinks.map((link, index) => (
+              <NavLink key={index} href={link.href} isScrolled={isScrolled}>
+                {link.label}
+                {link.label === "Contact" && (
+                  <ArrowRight className="ml-2 inline-block" size={18} />
+                )}
               </NavLink>
-            </div>
-          </div>
+            ))}
+          </motion.div>
 
+          {/* Mobile Menu Toggle */}
           <div className="md:hidden">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.9 }}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-purple-700 focus:outline-none"
+              className={`p-2 rounded-md focus:outline-none 
+              ${isScrolled ? "text-purple-600" : "text-white"}`}
             >
-              <Menu className="h-6 w-6" />
-            </button>
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </motion.button>
           </div>
         </div>
       </div>
 
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <MobileNavLink
-              href="#services"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Services
-            </MobileNavLink>
-            <MobileNavLink href="#about" onClick={() => setIsMenuOpen(false)}>
-              About
-            </MobileNavLink>
-            <MobileNavLink href="#contact" onClick={() => setIsMenuOpen(false)}>
-              Contact
-              <span className="ml-2 transform translate-x-[-10px] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
-                →
-              </span>
-            </MobileNavLink>
-          </div>
-        </div>
-      )}
-    </nav>
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            variants={menuVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="fixed inset-0 bg-purple-600 z-40 md:hidden"
+          >
+            <div className="flex flex-col h-full justify-center items-center space-y-8">
+              {navLinks.map((link, index) => (
+                <motion.div key={index} variants={linkVariants}>
+                  <MobileNavLink
+                    href={link.href}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.label}
+                    {link.label === "Contact" && (
+                      <ArrowRight className="ml-2 inline-block" size={24} />
+                    )}
+                  </MobileNavLink>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
 }
 
-function NavLink({ href, children }) {
+function NavLink({ href, children, isScrolled }) {
   return (
-    <Link
-      href={href}
-      className="group relative text-white px-3 py-2 rounded-md overflow-hidden"
-    >
-      <span className="relative z-10">{children}</span>
-      <div className="absolute inset-0 bg-purple-700 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0" />
-    </Link>
+    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+      <Link
+        href={href}
+        className={`relative group font-medium transition-colors duration-300
+        ${
+          isScrolled
+            ? "text-purple-600 hover:text-purple-800"
+            : "text-white hover:text-purple-200"
+        }`}
+      >
+        {children}
+        <span
+          className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500 
+          transition-all duration-300 group-hover:w-full"
+        />
+      </Link>
+    </motion.div>
   );
 }
 
@@ -98,11 +176,14 @@ function MobileNavLink({ href, onClick, children }) {
   return (
     <Link
       href={href}
-      className="group relative text-white block px-3 py-2 rounded-md overflow-hidden"
       onClick={onClick}
+      className="text-white text-3xl font-bold relative group"
     >
-      <span className="relative z-10">{children}</span>
-      <div className="absolute inset-0 bg-purple-700 transform -translate-x-full transition-transform duration-300 group-hover:translate-x-0" />
+      {children}
+      <span
+        className="absolute bottom-0 left-0 w-0 h-1 bg-white 
+        transition-all duration-300 group-hover:w-full"
+      />
     </Link>
   );
 }

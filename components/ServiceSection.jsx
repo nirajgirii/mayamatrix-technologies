@@ -205,9 +205,9 @@ const services = [
     ],
   },
 ];
-
 export default function ServicesSection() {
   const [selectedCategories, setSelectedCategories] = useState({});
+  const [isMobile, setIsMobile] = useState(false);
 
   // Set default selections on component mount
   useEffect(() => {
@@ -216,13 +216,55 @@ export default function ServicesSection() {
       defaultSelections[service.id] = service.categories[0];
     });
     setSelectedCategories(defaultSelections);
+
+    // Check if it's a mobile device
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Automatic shuffling for mobile devices
+  useEffect(() => {
+    let shuffleInterval;
+
+    if (isMobile) {
+      shuffleInterval = setInterval(() => {
+        setSelectedCategories((prev) => {
+          const newSelections = { ...prev };
+
+          services.forEach((service) => {
+            const currentCategoryIndex = service.categories.findIndex(
+              (cat) => cat.name === prev[service.id].name
+            );
+
+            // Cycle to the next category
+            const nextIndex =
+              (currentCategoryIndex + 1) % service.categories.length;
+            newSelections[service.id] = service.categories[nextIndex];
+          });
+
+          return newSelections;
+        });
+      }, 5000);
+    }
+
+    return () => {
+      if (shuffleInterval) clearInterval(shuffleInterval);
+    };
+  }, [isMobile]);
+
   const handleCategorySelect = (serviceId, category) => {
-    setSelectedCategories((prev) => ({
-      ...prev,
-      [serviceId]: category,
-    }));
+    // Only allow manual selection on non-mobile devices
+    if (!isMobile) {
+      setSelectedCategories((prev) => ({
+        ...prev,
+        [serviceId]: category,
+      }));
+    }
   };
 
   return (
@@ -245,6 +287,7 @@ export default function ServicesSection() {
               onCategorySelect={(category) =>
                 handleCategorySelect(service.id, category)
               }
+              isMobile={isMobile}
             />
           ))}
         </div>
@@ -253,7 +296,12 @@ export default function ServicesSection() {
   );
 }
 
-function ServiceCard({ service, selectedCategory, onCategorySelect }) {
+function ServiceCard({
+  service,
+  selectedCategory,
+  onCategorySelect,
+  isMobile,
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -282,8 +330,8 @@ function ServiceCard({ service, selectedCategory, onCategorySelect }) {
             {service.categories.map((category) => (
               <motion.button
                 key={category.name}
-                whileHover={{ scale: 1.02, x: 5 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={!isMobile ? { scale: 1.02, x: 5 } : undefined}
+                whileTap={!isMobile ? { scale: 0.98 } : undefined}
                 onClick={() => onCategorySelect(category)}
                 className={`px-4 md:px-6 py-3 md:py-4 rounded-lg font-medium text-left transition-all duration-300 ${
                   selectedCategory?.name === category.name
@@ -312,7 +360,9 @@ function ServiceCard({ service, selectedCategory, onCategorySelect }) {
               <h4 className="text-lg md:text-xl font-bold text-gray-800 mb-4">
                 {selectedCategory.name}
               </h4>
+
               <p className="text-gray-600 mb-6">{selectedCategory.details}</p>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 {selectedCategory.tech.map((tech) => (
                   <motion.div
